@@ -70,6 +70,7 @@ function App() {
     const currentIndex = allPuzzles.findIndex(p => p.id === puzzle.id);
     if (currentIndex > 0) {
       const previousPuzzle = allPuzzles[currentIndex - 1];
+      if (!previousPuzzle) return;
       setPuzzle(previousPuzzle);
       setIsArchiveMode(previousPuzzle.id !== todaysPuzzle?.id);
     }
@@ -80,6 +81,7 @@ function App() {
     const currentIndex = allPuzzles.findIndex(p => p.id === puzzle.id);
     if (currentIndex < allPuzzles.length - 1) {
       const nextPuzzle = allPuzzles[currentIndex + 1];
+      if (!nextPuzzle) return;
       setPuzzle(nextPuzzle);
       setIsArchiveMode(nextPuzzle.id !== todaysPuzzle?.id);
     }

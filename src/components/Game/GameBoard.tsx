@@ -13,10 +13,6 @@ interface GameBoardProps {
 export function GameBoard({ puzzle, isArchiveMode = false }: GameBoardProps) {
   const { gameService, storageService, statisticsService, shareService } = useServices();
 
-  const getStorageKey = () => {
-    return isArchiveMode ? `archive_${puzzle.id}` : 'current';
-  };
-
   const loadGameState = (): GameState => {
     if (isArchiveMode) {
       // For archive, use a different storage approach
