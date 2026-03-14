@@ -5,11 +5,12 @@ interface GameResultProps {
   gameState: GameState;
   correctAnswer: string;
   onShare: () => void;
+  onViewClues: () => void;
   shareSuccess?: boolean;
   isArchiveMode?: boolean;
 }
 
-export function GameResult({ gameState, correctAnswer, onShare, shareSuccess, isArchiveMode = false }: GameResultProps) {
+export function GameResult({ gameState, correctAnswer, onShare, onViewClues, shareSuccess, isArchiveMode = false }: GameResultProps) {
   const isWin = gameState.status === 'won';
 
   return (
@@ -20,8 +21,9 @@ export function GameResult({ gameState, correctAnswer, onShare, shareSuccess, is
           <>
             <div className="text-5xl md:text-6xl">✅</div>
             <h2 className="text-2xl md:text-3xl font-bold text-green-600">Congratulations!</h2>
+            <p className="text-xl md:text-2xl font-bold text-gray-900">{correctAnswer}</p>
             <p className="text-base md:text-lg text-gray-700">
-              You guessed it in{' '}
+              Guessed in{' '}
               <span className="font-bold text-green-600">{gameState.revealedClues}</span>{' '}
               {gameState.revealedClues === 1 ? 'clue' : 'clues'}!
             </p>
@@ -30,9 +32,7 @@ export function GameResult({ gameState, correctAnswer, onShare, shareSuccess, is
           <>
             <div className="text-5xl md:text-6xl">😔</div>
             <h2 className="text-2xl md:text-3xl font-bold text-red-600">Better luck next time!</h2>
-            <p className="text-base md:text-lg text-gray-700">
-              The answer was: <span className="font-bold text-gray-900">{correctAnswer}</span>
-            </p>
+            <p className="text-xl md:text-2xl font-bold text-gray-900">{correctAnswer}</p>
           </>
         )}
       </div>
@@ -40,16 +40,20 @@ export function GameResult({ gameState, correctAnswer, onShare, shareSuccess, is
       {/* Share button */}
       <div className="pt-2 md:pt-3">
         <Button onClick={onShare} variant={shareSuccess ? 'success' : 'primary'} className="w-full">
-          {shareSuccess ? '✓ Copied to Clipboard!' : 'Share Result 💧'}
+          {shareSuccess ? '✓ Copied to Clipboard!' : 'Share Result'}
         </Button>
       </div>
 
+      {/* View clues */}
+      <button
+        onClick={onViewClues}
+        className="text-sm font-medium px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+      >
+        Back to clues
+      </button>
+
       {/* Next puzzle info */}
-      {isArchiveMode ? (
-        <p className="text-xs md:text-sm text-gray-500">
-          📅 Archive puzzle
-        </p>
-      ) : (
+      {!isArchiveMode && (
         <p className="text-xs md:text-sm text-gray-500">Come back tomorrow for a new puzzle!</p>
       )}
     </div>

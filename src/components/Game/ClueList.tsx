@@ -3,9 +3,10 @@ interface ClueListProps {
   revealedCount: number;
   guesses: string[];
   isWon?: boolean;
+  animated?: boolean;
 }
 
-export function ClueList({ clues, revealedCount, guesses, isWon = false }: ClueListProps) {
+export function ClueList({ clues, revealedCount, guesses, isWon = false, animated = true }: ClueListProps) {
   return (
     <div className="space-y-2 md:space-y-3">
       {clues.slice(0, revealedCount).map((clue, index) => {
@@ -17,7 +18,7 @@ export function ClueList({ clues, revealedCount, guesses, isWon = false }: ClueL
         return (
           <div
             key={index}
-            className="bg-white border-2 border-gray-200 rounded-lg shadow-sm animate-fadeIn p-2.5 md:p-4"
+            className={`bg-white border-2 border-gray-200 rounded-lg shadow-sm p-2.5 md:p-4 ${animated ? 'animate-fadeIn' : ''}`}
           >
             {/* Clue and Guess Container */}
             <div className="flex flex-row items-start gap-2 md:gap-4 flex-wrap">

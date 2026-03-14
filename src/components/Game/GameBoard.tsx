@@ -37,6 +37,7 @@ export function GameBoard({ puzzle, isArchiveMode = false }: GameBoardProps) {
   const [gameState, setGameState] = useState<GameState>(loadGameState);
   const [feedback, setFeedback] = useState<string>('');
   const [shareSuccess, setShareSuccess] = useState(false);
+  const [showResult, setShowResult] = useState(() => gameService.isGameOver(loadGameState()));
 
   // Reset game state when puzzle changes and auto-reveal first clue if needed
   useEffect(() => {
@@ -52,6 +53,7 @@ export function GameBoard({ puzzle, isArchiveMode = false }: GameBoardProps) {
 
     setFeedback('');
     setShareSuccess(false);
+    setShowResult(gameService.isGameOver(loadedState));
   }, [puzzle.id, isArchiveMode]);
 
   // Save game state whenever it changes
@@ -91,6 +93,7 @@ export function GameBoard({ puzzle, isArchiveMode = false }: GameBoardProps) {
       if (result.isCorrect) {
         setGameState(result.gameState);
         setFeedback('Correct! 🎉');
+        setShowResult(true);
       } else {
         setFeedback(`"${guess}" is not correct. Try again!`);
 
@@ -100,6 +103,7 @@ export function GameBoard({ puzzle, isArchiveMode = false }: GameBoardProps) {
           setGameState(withNextClue);
         } else {
           setGameState(result.gameState);
+          setShowResult(true);
         }
       }
     } catch (error) {
@@ -137,56 +141,70 @@ export function GameBoard({ puzzle, isArchiveMode = false }: GameBoardProps) {
 
   return (
     <div className="space-y-3 md:space-y-5">
-      {/* Instructions */}
-      {!isGameOver && gameState.revealedClues === 1 && gameState.guesses.length === 0 && (
-        <div className="text-center">
-          <p className="text-sm md:text-base text-gray-600">
-            Guess the mystery person!
-          </p>
-        </div>
-      )}
-
-      {/* Clues */}
-      {gameState.revealedClues > 0 && (
-        <ClueList
-          clues={puzzle.clues}
-          revealedCount={gameState.revealedClues}
-          guesses={gameState.guesses}
-          isWon={gameState.status === 'won'}
-        />
-      )}
-
-      {/* Game controls or result */}
-      {isGameOver ? (
+      {isGameOver && showResult ? (
         <GameResult
           gameState={gameState}
           correctAnswer={puzzle.person.name}
           onShare={handleShare}
+          onViewClues={() => setShowResult(false)}
           shareSuccess={shareSuccess}
           isArchiveMode={isArchiveMode}
         />
       ) : (
-        <div className="space-y-3 md:space-y-4">
-          {/* Guess input */}
-          <GuessInput
-            onSubmitGuess={handleSubmitGuess}
-            onSkipClue={handleSkipClue}
-            canSkip={gameService.canRevealClue(gameState)}
-          />
-
-          {/* Feedback */}
-          {feedback && (
-            <div
-              className={`p-2.5 md:p-3 rounded-lg text-center font-medium text-sm md:text-base ${
-                feedback.includes('Correct')
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-yellow-100 text-yellow-800'
-              }`}
-            >
-              {feedback}
+        <>
+          {/* Instructions */}
+          {!isGameOver && gameState.revealedClues === 1 && gameState.guesses.length === 0 && (
+            <div className="text-center">
+              <p className="text-sm md:text-base text-gray-600">Guess the mystery person!</p>
             </div>
           )}
-        </div>
+
+          {/* Clues */}
+          {gameState.revealedClues > 0 && (
+            <ClueList
+              clues={puzzle.clues}
+              revealedCount={gameState.revealedClues}
+              guesses={gameState.guesses}
+              isWon={gameState.status === 'won'}
+              animated={!isGameOver}
+            />
+          )}
+
+          {/* View result button when reviewing clues */}
+          {isGameOver && (
+            <div className="text-center">
+              <button
+                onClick={() => setShowResult(true)}
+                className="text-sm font-medium px-4 py-1.5 rounded-full bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors"
+              >
+                View result
+              </button>
+            </div>
+          )}
+
+          {/* Guess input when game is in progress */}
+          {!isGameOver && (
+            <div className="space-y-3 md:space-y-4">
+              <GuessInput
+                onSubmitGuess={handleSubmitGuess}
+                onSkipClue={handleSkipClue}
+                canSkip={gameService.canRevealClue(gameState)}
+              />
+
+              {feedback && (
+                <div
+                  className={`p-2.5 md:p-3 rounded-lg text-center font-medium text-sm md:text-base ${
+                    feedback.includes('Correct')
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}
+                >
+                  {feedback}
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
