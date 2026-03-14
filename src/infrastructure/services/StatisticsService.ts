@@ -5,7 +5,7 @@ import { GameState, PlayerStats } from '@/domain/models';
  * Implementation of statistics tracking logic
  */
 export class StatisticsService implements IStatisticsService {
-  updateStats(stats: PlayerStats, gameState: GameState, puzzleDate: string): PlayerStats {
+  updateStats(stats: PlayerStats, gameState: GameState, puzzleDate: string, isArchiveMode = false): PlayerStats {
     if (gameState.status === 'in_progress') {
       throw new Error('Cannot update stats: game is not completed');
     }
@@ -25,20 +25,24 @@ export class StatisticsService implements IStatisticsService {
         [cluesUsed]: (updatedStats.clueDistribution[cluesUsed] || 0) + 1,
       };
 
-      // Update streaks
-      const isConsecutiveDay = this.isConsecutiveDay(stats.lastPlayedDate, puzzleDate);
-      if (isConsecutiveDay || stats.currentStreak === 0) {
-        updatedStats.currentStreak++;
-        updatedStats.maxStreak = Math.max(updatedStats.maxStreak, updatedStats.currentStreak);
-      } else {
-        updatedStats.currentStreak = 1;
+      // Only update streaks for today's puzzle, not archive plays
+      if (!isArchiveMode) {
+        const isConsecutiveDay = this.isConsecutiveDay(stats.lastPlayedDate, puzzleDate);
+        if (isConsecutiveDay || stats.currentStreak === 0) {
+          updatedStats.currentStreak++;
+          updatedStats.maxStreak = Math.max(updatedStats.maxStreak, updatedStats.currentStreak);
+        } else {
+          updatedStats.currentStreak = 1;
+        }
       }
-    } else {
-      // Lost - reset streak
+    } else if (!isArchiveMode) {
+      // Lost on today's puzzle - reset streak
       updatedStats.currentStreak = 0;
     }
 
-    updatedStats.lastPlayedDate = puzzleDate;
+    if (!isArchiveMode) {
+      updatedStats.lastPlayedDate = puzzleDate;
+    }
 
     return updatedStats;
   }

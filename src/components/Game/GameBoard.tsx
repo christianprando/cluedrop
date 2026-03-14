@@ -74,7 +74,7 @@ export function GameBoard({ puzzle, isArchiveMode = false }: GameBoardProps) {
       // Only update stats if this puzzle hasn't been completed before
       if (!completedPuzzles.includes(puzzle.id)) {
         const stats = storageService.getPlayerStats();
-        const updatedStats = statisticsService.updateStats(stats, gameState, puzzle.date);
+        const updatedStats = statisticsService.updateStats(stats, gameState, puzzle.date, isArchiveMode);
         storageService.savePlayerStats(updatedStats);
 
         // Mark this puzzle as completed

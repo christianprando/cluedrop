@@ -11,7 +11,7 @@ export interface IStatisticsService {
    * @param puzzleDate - The date of the puzzle
    * @returns Updated statistics
    */
-  updateStats(stats: PlayerStats, gameState: GameState, puzzleDate: string): PlayerStats;
+  updateStats(stats: PlayerStats, gameState: GameState, puzzleDate: string, isArchiveMode?: boolean): PlayerStats;
 
   /**
    * Calculate win rate percentage

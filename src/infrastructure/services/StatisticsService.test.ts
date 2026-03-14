@@ -158,6 +158,54 @@ describe('StatisticsService', () => {
       expect(stats.clueDistribution[7]).toBe(1);
     });
 
+    it('should not update streak or lastPlayedDate for archive mode win', () => {
+      const stats: PlayerStats = {
+        ...initialStats,
+        currentStreak: 3,
+        maxStreak: 3,
+        lastPlayedDate: '2026-03-05',
+      };
+
+      const archiveWin: GameState = {
+        puzzleId: 1,
+        revealedClues: 4,
+        guesses: ['Einstein'],
+        status: 'won',
+        guessedAt: Date.now(),
+      };
+
+      const updatedStats = statsService.updateStats(stats, archiveWin, '2026-02-01', true);
+
+      expect(updatedStats.gamesPlayed).toBe(1);
+      expect(updatedStats.gamesWon).toBe(1);
+      expect(updatedStats.clueDistribution[4]).toBe(1);
+      expect(updatedStats.currentStreak).toBe(3); // unchanged
+      expect(updatedStats.maxStreak).toBe(3);     // unchanged
+      expect(updatedStats.lastPlayedDate).toBe('2026-03-05'); // unchanged
+    });
+
+    it('should not reset streak for archive mode loss', () => {
+      const stats: PlayerStats = {
+        ...initialStats,
+        currentStreak: 3,
+        maxStreak: 3,
+        lastPlayedDate: '2026-03-05',
+      };
+
+      const archiveLoss: GameState = {
+        puzzleId: 1,
+        revealedClues: 10,
+        guesses: [],
+        status: 'lost',
+      };
+
+      const updatedStats = statsService.updateStats(stats, archiveLoss, '2026-02-01', true);
+
+      expect(updatedStats.gamesPlayed).toBe(1);
+      expect(updatedStats.currentStreak).toBe(3); // unchanged
+      expect(updatedStats.lastPlayedDate).toBe('2026-03-05'); // unchanged
+    });
+
     it('should throw error if game is in progress', () => {
       const gameState: GameState = {
         puzzleId: 1,
