@@ -148,6 +148,14 @@ function App() {
             {/* Navigation Controls */}
             <div className="flex items-center gap-2">
               {/* Previous/Next Navigation with Calendar */}
+              {/* Back to Today pill — always rendered to prevent layout shift */}
+              <button
+                onClick={handleBackToToday}
+                className={`text-xs md:text-sm font-medium px-2 py-1 rounded-full bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors ${isArchiveMode ? 'visible' : 'invisible'}`}
+              >
+                Today
+              </button>
+
               <div className="flex items-center gap-1">
                 <button
                   onClick={handlePreviousPuzzle}
@@ -187,16 +195,6 @@ function App() {
                   </svg>
                 </button>
               </div>
-
-              {/* Back to Today pill — only shown in archive mode */}
-              {isArchiveMode && (
-                <button
-                  onClick={handleBackToToday}
-                  className="text-xs md:text-sm font-medium px-2 py-1 rounded-full bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors"
-                >
-                  Today
-                </button>
-              )}
 
               {/* Stats Button */}
               <Button variant="secondary" size="sm" onClick={() => setShowStats(true)}>
